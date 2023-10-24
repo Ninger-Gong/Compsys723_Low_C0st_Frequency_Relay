@@ -81,7 +81,7 @@ int reaction_time[5];
 
 #define CHECK_BIT(var,pos) ((var) & (1<<(pos))) // macro checks if a specific bit is set
 
-typedef struct{
+typedef struct{//Line Type for Display
 	unsigned int x1;
 	unsigned int y1;
 	unsigned int x2;
