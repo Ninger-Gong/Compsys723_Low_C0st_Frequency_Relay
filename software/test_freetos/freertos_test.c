@@ -433,13 +433,13 @@ void maintenance_Task(void *pvParamters){
 			}
 
 			int counter = 0;
-			for (a = 0; a < 5; a++) {
+			for (a = 0; a < 5; a++) {//check if all loads are as required in Maintenance state
 				if (load_state[a] == 1) {
 					counter++;
 				}
 			}
 
-			if (counter == 5) {
+			if (counter == 5) { //if all loads are on, set the all_on flag on
 				xSemaphoreTake(allOnSemaphore, portMAX_DELAY);
 				all_on = 1;
 				xSemaphoreGive(allOnSemaphore);
@@ -464,14 +464,14 @@ void manageLoad_Task(void *pvParamters) {
 				/* See if we can obtain the semaphore.  If the semaphore is not
 						        available wait 10 ticks to see if it becomes free. */
 
-				if (stable == 0) {
-					if (first_load_shed_flag == 1) { // shed first load, calculae time taking
+				if (stable == 0) { //not stable. the stability flag is down
+					if (first_load_shed_flag == 1) { // shed first load, calculate time taking
 							if( xSemaphoreTake( loadStatusSemaphore, ( TickType_t ) 10 ) == pdTRUE ){
 								load_state[0] = 0;// 0 means shed
 								xSemaphoreGive( loadStatusSemaphore );
 								first_led = 1;
 								freq_relay_start = 1;
-								tick4 =  xTaskGetTickCount();
+								tick4 =  xTaskGetTickCount();//how many ticks does the shed takes
 
 								reaction_time[b] = tick4 - tick3;
 								if(reaction_time[b] < minimum){
@@ -486,7 +486,7 @@ void manageLoad_Task(void *pvParamters) {
 									b = 0;
 								}
 							}
-							first_load_shed_flag = 0;
+							first_load_shed_flag = 0; //once the first load is shed, the flag is down
 					}
 				}
 
@@ -498,7 +498,7 @@ void manageLoad_Task(void *pvParamters) {
 						//dectecting maunually shed
 						for (a = 0; a < 5; a++) {
 							if (updatedSwitch & (1<<a)){
-								//load_state[a] = 1;
+								load_state[a] = 1;
 							} else {
 								xSemaphoreTake(loadStatusSemaphore, portMAX_DELAY);
 								load_state[a] = 0;
@@ -506,7 +506,7 @@ void manageLoad_Task(void *pvParamters) {
 								xSemaphoreGive(loadStatusSemaphore);
 							}
 						}
-						if (stable != PREVstable) {
+						if (stable != PREVstable) { //if the system is not stable, reset the timer
 							//reset timer
 							xTimerReset(timer500, 10);//status changes
 							timeout_500 = 0;
